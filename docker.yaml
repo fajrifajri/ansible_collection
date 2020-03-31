@@ -1,0 +1,43 @@
+- name: install docker on Centos
+  hosts: server1
+  tasks:
+  - name: Uninstall Old Version of Docker
+    become: true
+    yum: 
+      state: absent
+      name:
+        - docker
+        - docker-client
+        - docker-client-latest
+        - docker-common
+        - docker-latest
+        - docker-latest-logrotate
+        - docker-logrotate
+        - docker-engine
+  - name: install yum utils
+    become: true
+    yum:
+      state: latest
+      name:
+        - yum-utils
+        - device-mapper-persistent-data
+        - lvm2
+  - name: Add repository
+    become: true
+    get_url:
+      url: https://download.docker.com/linux/centos/docker-ce.repo
+      dest: /etc/yum.repos.d/docker.repo
+  - name: install docker
+    become: true
+    yum:
+      state: latest
+      name:
+        - docker-ce 
+        - docker-ce-cli 
+        - containerd.io
+  - name: Run docker
+    become: yes
+    service:
+      name: docker
+      state: started
+      enabled: yes
